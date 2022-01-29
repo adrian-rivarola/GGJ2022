@@ -1,4 +1,4 @@
-# Webpack + Phaser3 + Typescript Tutorial
+# Pro Fun Epidemic
 
 This is full codebase from [this](https://www.notion.so/daniellotos/Phaser-js-f70de1dfae1944fe8a0452ac865b90f8) tutorial.
 
