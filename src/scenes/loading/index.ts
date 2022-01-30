@@ -24,6 +24,7 @@ export class LoadingScene extends Scene {
       frameWidth: 16,
       frameHeight: 16,
     });
+    this.load.atlas('chest', 'tilemaps/tiles/dungeon-16-16.png', 'spritesheets/chest_atlas.json');
   }
 
   create(): void {

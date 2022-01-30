@@ -57,6 +57,8 @@ export class Player extends Actor {
         this.updateXp(10);
       }
     };
+
+    this.initListeners();
   }
 
   get canAttack(): boolean {
@@ -160,6 +162,10 @@ export class Player extends Actor {
       }),
       frameRate: 8,
     });
+  }
+
+  private initListeners() {
+    this.scene.game.events.on(EVENTS_NAME.chestLoot, this.chestLootHandler);
   }
 
   public getDamage(value?: number): void {

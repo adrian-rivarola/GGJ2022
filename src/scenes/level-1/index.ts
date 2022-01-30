@@ -1,5 +1,6 @@
 import { GameObjects, Scene, Tilemaps } from 'phaser';
 
+import { Chest } from '../../classes/chest';
 import { Player } from '../../classes/player';
 import { Enemy } from '../../classes/enemy';
 import { Spawner } from '../../classes/spawner';
@@ -53,16 +54,9 @@ export class Level1 extends Scene {
     );
 
     this.chests = chestPoints.map((chestPoint) =>
-      this.physics.add.sprite(chestPoint.x, chestPoint.y, 'tiles_spr', 595).setScale(1.5),
+      new Chest(this, chestPoint.x, chestPoint.y, 'tiles_spr', this.player, 595)
+        .setScale(1.5)
     );
-
-    this.chests.forEach((chest) => {
-      this.physics.add.overlap(this.player, chest, (obj1, obj2) => {
-        obj2.destroy();
-        this.player.chestLootHandler();
-        // this.cameras.main.flash(50);
-      });
-    });
   }
 
   private initEnemies(): void {
