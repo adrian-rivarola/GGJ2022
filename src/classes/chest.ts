@@ -6,7 +6,7 @@ import { Player } from './player';
 
 export class Chest extends Actor {
   private target: Player;
-  private DAMAGE_POINTS = 20;
+  private DAMAGE_POINTS = 15;
   private RESPAWN_TIME = 15000;
 
   constructor(
@@ -27,7 +27,11 @@ export class Chest extends Actor {
     this.initAnimations();
     this.initOverlap();
 
-    this.on('animationcomplete', () => this.disableBody(true, true));
+    this.on('animationcomplete', () => {
+      this.scene.time.delayedCall(300, () => {
+        this.disableBody(true, true);
+      });
+    });
   }
 
   private initAnimations(): void {
@@ -38,6 +42,7 @@ export class Chest extends Actor {
         end: 4,
       }),
       frameRate: 8,
+      hideOnComplete: false,
     });
 
     this.scene.anims.create({
@@ -47,14 +52,14 @@ export class Chest extends Actor {
         end: 4,
       }),
       frameRate: 8,
+      hideOnComplete: false,
     });
   }
 
   private initOverlap(): void {
     const overlap = this.scene.physics.add.overlap(this.target, this, () => {
-
       this.scene.physics.world.removeCollider(overlap);
-      if (Math.round(Math.random())) {
+      if (Math.random() < 0.3) {
         this.anims.play('bad');
         this.target.getDamage(this.DAMAGE_POINTS);
       } else {
@@ -62,10 +67,10 @@ export class Chest extends Actor {
         this.scene.game.events.emit(EVENTS_NAME.chestLoot);
       }
 
-      setTimeout(() => {
+      this.scene.time.delayedCall(this.RESPAWN_TIME, () => {
         this.enableBody(true, this.x, this.y, true, true);
         this.initOverlap();
-      }, this.RESPAWN_TIME);
+      });
     });
   }
 }
