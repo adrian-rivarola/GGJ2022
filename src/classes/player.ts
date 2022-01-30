@@ -78,7 +78,8 @@ export class Player extends Actor {
     if (this.level % 5 === 0) {
       this.maxHitsPerAttack++;
       const attackAnim = this.scene.anims.get('attack');
-      attackAnim.frameRate = Phaser.Math.Clamp(attackAnim.frameRate + 2, 8, 14);
+      if (attackAnim != null)
+        attackAnim.frameRate = Phaser.Math.Clamp(attackAnim.frameRate + 2, 8, 14);
     }
 
     this.nextUpgrade = Math.ceil(this.nextUpgrade * 1.1);
