@@ -1,7 +1,7 @@
 import { Physics } from 'phaser';
 
 export class Actor extends Physics.Arcade.Sprite {
-  protected hp = 100;
+  protected hp = 90;
 
   constructor(scene: Phaser.Scene, x: number, y: number, texture: string, frame?: string | number) {
     super(scene, x, y, texture, frame);
@@ -18,9 +18,10 @@ export class Actor extends Physics.Arcade.Sprite {
       duration: 100,
       repeat: 3,
       yoyo: true,
-      alpha: 0.5,
+      alpha: 0.7,
       onStart: () => {
         if (value) {
+          this.tint = 0xff3333;
           this.hp = this.hp - value;
         }
       },

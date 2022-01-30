@@ -8,6 +8,7 @@ export class Enemy extends Actor {
   private target: Player;
   private AGRESSOR_RADIUS = 150;
   private attackHandler: () => void;
+  scale = 1.5;
 
   constructor(
     scene: Scene,
@@ -22,16 +23,21 @@ export class Enemy extends Actor {
 
     this.attackHandler = () => {
       if (
+        this.target.canAttack &&
         Math.Distance.BetweenPoints(
           { x: this.x, y: this.y },
           { x: this.target.x, y: this.target.y },
         ) <
-        this.target.width / 2
+          this.target.width * 0.75 &&
+        this.flipX == this.target.scaleX > 0
       ) {
         this.getDamage();
         this.disableBody(true, false);
+        this.tint = 0xff3333;
 
-        this.scene.time.delayedCall(300, () => {
+        this.target.onEnemyKilled();
+
+        this.scene.time.delayedCall(100, () => {
           this.destroy();
         });
       }
@@ -61,9 +67,14 @@ export class Enemy extends Actor {
     ) {
       this.getBody().setVelocityX(this.target.x - this.x);
       this.getBody().setVelocityY(this.target.y - this.y);
+      this.checkFlip();
     } else {
       this.getBody().setVelocity(0);
     }
+  }
+
+  protected checkFlip(): void {
+    this.flipX = this.body.velocity.x < 0;
   }
 
   public setTarget(target: Player): void {

@@ -1,4 +1,5 @@
 import { Input, Scene } from 'phaser';
+import { Level1 } from 'src/scenes';
 
 import { EVENTS_NAME, GameStatus } from '../consts';
 import { Actor } from './actor';
@@ -10,7 +11,13 @@ export class Player extends Actor {
   private keyS: Input.Keyboard.Key;
   private keyD: Input.Keyboard.Key;
   private keySpace: Input.Keyboard.Key;
-  private hpValue: Text;
+  private hpText!: Text;
+  private maxHitsPerAttack = 2;
+  private nextUpgrade = 16;
+  private enemiesHit = 0;
+  private maxHP = 90;
+  private xp = 0;
+  chestLootHandler!: () => void;
 
   constructor(scene: Scene, x: number, y: number) {
     super(scene, x, y, 'king');
@@ -22,11 +29,12 @@ export class Player extends Actor {
     this.keyD = this.scene.input.keyboard.addKey('D');
     this.keySpace = this.scene.input.keyboard.addKey(32);
     this.keySpace.on('down', (event: KeyboardEvent) => {
+      this.enemiesHit = 0;
       this.anims.play('attack', true);
       this.scene.game.events.emit(EVENTS_NAME.attack);
     });
 
-    this.hpValue = new Text(this.scene, this.x, this.y - this.height, this.hp.toString())
+    this.hpText = new Text(this.scene, this.x, this.y - this.height, this.hp.toString())
       .setFontSize(12)
       .setOrigin(0.8, 0.5);
 
@@ -40,10 +48,62 @@ export class Player extends Actor {
     this.on('destroy', () => {
       this.keySpace.removeAllListeners();
     });
+
+    this.chestLootHandler = () => {
+      if (this.hp < this.maxHP) {
+        this.updateHp(15);
+      } else {
+        this.xp += 10;
+      }
+    };
+  }
+
+  get canAttack(): boolean {
+    return this.enemiesHit < this.maxHitsPerAttack;
+  }
+
+  get normalizedHP() {
+    return Math.floor(this.hp / 15);
+  }
+
+  levelUp() {
+    this.xp = 0;
+    this.maxHP += 30;
+    this.updateHp(this.maxHP * 0.25);
+
+    this.nextUpgrade = Math.ceil(this.nextUpgrade * 1.15);
+    this.scene.cameras.main.flash();
+
+    const attackAnim = this.scene.anims.get('attack');
+    if (attackAnim.frameRate < 16) {
+      attackAnim.frameRate += 4;
+    }
+  }
+
+  updateHp(value: number) {
+    this.hp = Phaser.Math.Clamp(this.hp + value, 0, this.maxHP);
+    this.scene.game.events.emit(EVENTS_NAME.hpChange, this.normalizedHP);
+  }
+
+  onEnemyKilled() {
+    this.scene.cameras.main.shake(50, new Phaser.Math.Vector2(0.01, 0.0));
+    this.xp++;
+    this.enemiesHit++;
+    if (this.enemiesHit == this.maxHitsPerAttack) this.xp++;
+
+    if (this.xp > this.nextUpgrade) {
+      this.levelUp();
+    }
   }
 
   update(): void {
     this.getBody().setVelocity(0);
+
+    this.hpText.setText(
+      `XP: ${this.xp}/${this.nextUpgrade}\nHP: ${this.normalizedHP}/${this.maxHP / 15}`,
+    );
+    this.hpText.setPosition(this.x, this.y - this.height * 0.56);
+    this.hpText.setOrigin(0.8, 0.5);
 
     if (this.keyW?.isDown) {
       this.body.velocity.y = -110;
@@ -68,9 +128,6 @@ export class Player extends Actor {
       this.getBody().setOffset(15, 15);
       !this.anims.isPlaying && this.anims.play('run', true);
     }
-
-    this.hpValue.setPosition(this.x, this.y - this.height * 0.4);
-    this.hpValue.setOrigin(0.8, 0.5);
   }
 
   private initAnimations(): void {
@@ -94,11 +151,15 @@ export class Player extends Actor {
   }
 
   public getDamage(value?: number): void {
-    super.getDamage(value);
-    this.hpValue.setText(this.hp.toString());
+    if (!value) return;
 
-    if (this.hp <= 0) {
+    super.getDamage(value);
+    this.updateHp(-value);
+    this.scene.time.delayedCall(50, () => this.clearTint());
+
+    if (this.hp < 0) {
       this.scene.game.events.emit(EVENTS_NAME.gameEnd, GameStatus.LOSE);
+      this.scene.game.events.off(EVENTS_NAME.chestLoot, this.chestLootHandler);
     }
   }
 }
