@@ -171,9 +171,15 @@ export class Player extends Actor {
   public getDamage(value?: number): void {
     if (!value) return;
 
+    var prevHP = this.normalizedHP;
+
     super.getDamage(value);
     this.updateHp(-value);
     this.scene.time.delayedCall(100, () => this.clearTint());
+
+    if (this.normalizedHP < prevHP) {
+      this.scene.sound.add('badChest').play();
+    }
 
     if (this.hp <= 0) {
       this.scene.game.events.emit(EVENTS_NAME.gameEnd, GameStatus.LOSE);
