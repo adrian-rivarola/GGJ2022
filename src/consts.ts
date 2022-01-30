@@ -1,6 +1,6 @@
 export enum EVENTS_NAME {
   gameEnd = 'game-end',
-  chestLoot = 'chest-loot',
+  levelUp = 'level-up',
   attack = 'attack',
   hpChange = 'hp-change',
 }

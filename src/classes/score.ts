@@ -1,41 +1,41 @@
 import { Text } from './text';
 
-export enum ScoreOperations {
+export enum LevelOperations {
   INCREASE,
   DECREASE,
   SET_VALUE,
 }
 
-export class Score extends Text {
-  private scoreValue: number;
+export class Level extends Text {
+  private levelValue: number;
 
   constructor(scene: Phaser.Scene, x: number, y: number, initScore = 0) {
-    super(scene, x, y, `Score: ${initScore}`);
+    super(scene, x, y, `Level: ${initScore}`);
 
     scene.add.existing(this);
 
-    this.scoreValue = initScore;
+    this.levelValue = initScore;
   }
 
-  public changeValue(operation: ScoreOperations, value: number): void {
+  public changeValue(operation: LevelOperations, value: number): void {
     switch (operation) {
-      case ScoreOperations.INCREASE:
-        this.scoreValue += value;
+      case LevelOperations.INCREASE:
+        this.levelValue += value;
         break;
-      case ScoreOperations.DECREASE:
-        this.scoreValue -= value;
+      case LevelOperations.DECREASE:
+        this.levelValue -= value;
         break;
-      case ScoreOperations.SET_VALUE:
-        this.scoreValue = value;
+      case LevelOperations.SET_VALUE:
+        this.levelValue = value;
         break;
       default:
         break;
     }
 
-    this.setText(`Score: ${this.scoreValue}`);
+    this.setText(`Level: ${this.levelValue}`);
   }
 
   public getValue(): number {
-    return this.scoreValue;
+    return this.levelValue;
   }
 }

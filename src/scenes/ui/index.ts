@@ -1,7 +1,7 @@
 import { GameObjects, Scene } from 'phaser';
 
 import { EVENTS_NAME, GameStatus, UpdateLifeOperation } from '../../consts';
-import { Score, ScoreOperations } from '../../classes/score';
+import { Level, LevelOperations } from '../../classes/score';
 import { Text } from '../../classes/text';
 import { gameConfig } from '../../';
 import { Player } from 'src/classes/player';
@@ -13,23 +13,19 @@ enum HeartFrames {
 }
 
 export class UIScene extends Scene {
-  private score!: Score;
+  private level!: Level;
   private gameEndPhrase!: Text;
   private hearts: GameObjects.Sprite[] = [];
   maxHearts = 3;
 
-  private chestLootHandler: () => void;
+  private levelUpHandler: () => void;
   private gameEndHandler: (status: GameStatus) => void;
 
   constructor() {
     super('ui-scene');
 
-    this.chestLootHandler = () => {
-      this.score.changeValue(ScoreOperations.INCREASE, 10);
-
-      // if (this.score.getValue() === gameConfig.winScore) {
-      //   this.game.events.emit(EVENTS_NAME.gameEnd, 'win');
-      // }
+    this.levelUpHandler = () => {
+      this.level.changeValue(LevelOperations.INCREASE, 1);
     };
 
     this.gameEndHandler = (status) => {
@@ -55,7 +51,7 @@ export class UIScene extends Scene {
       );
 
       this.input.on('pointerdown', () => {
-        this.game.events.off(EVENTS_NAME.chestLoot, this.chestLootHandler);
+        this.game.events.off(EVENTS_NAME.levelUp, this.levelUpHandler);
         this.game.events.off(EVENTS_NAME.gameEnd, this.gameEndHandler);
         this.scene.get('level-1-scene').scene.restart();
         this.scene.restart();
@@ -67,7 +63,7 @@ export class UIScene extends Scene {
   }
 
   create(): void {
-    this.score = new Score(this, 20, 20, 0);
+    this.level = new Level(this, 20, 20, 0);
     this.initListeners();
 
     this.createHearts();
@@ -102,7 +98,7 @@ export class UIScene extends Scene {
   }
 
   private initListeners(): void {
-    this.game.events.on(EVENTS_NAME.chestLoot, this.chestLootHandler, this);
+    this.game.events.on(EVENTS_NAME.levelUp, this.levelUpHandler, this);
     this.game.events.on(EVENTS_NAME.hpChange, this.updateLife, this);
     this.game.events.once(EVENTS_NAME.gameEnd, this.gameEndHandler, this);
   }

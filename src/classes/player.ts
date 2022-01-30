@@ -17,6 +17,7 @@ export class Player extends Actor {
   private enemiesHit = 0;
   private maxHP = 90;
   private xp = 0;
+  level = 0;
   chestLootHandler!: () => void;
 
   constructor(scene: Scene, x: number, y: number) {
@@ -67,17 +68,22 @@ export class Player extends Actor {
   }
 
   levelUp() {
-    this.xp = 0;
+    this.xp = this.xp - this.nextUpgrade;
+    this.level++;
     this.maxHP += 30;
     this.updateHp(this.maxHP * 0.25);
 
-    this.nextUpgrade = Math.ceil(this.nextUpgrade * 1.15);
+    if (this.level < 8) this.maxHitsPerAttack += 0.25;
+
+    this.nextUpgrade = Math.ceil(this.nextUpgrade * 1.1);
     this.scene.cameras.main.flash();
 
     const attackAnim = this.scene.anims.get('attack');
     if (attackAnim.frameRate < 16) {
       attackAnim.frameRate += 4;
     }
+
+    this.scene.game.events.emit(EVENTS_NAME.levelUp);
   }
 
   updateHp(value: number) {

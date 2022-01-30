@@ -15,7 +15,7 @@ export class Spawner extends Actor {
   private coolDownTimer = 0;
   private MIN_SPAWNS = 0;
   private MAX_SPAWNS = 3;
-  alpha = 0;
+  private levelUpHandler: () => void;
 
   constructor(
     scene: Scene,
@@ -27,9 +27,19 @@ export class Spawner extends Actor {
   ) {
     super(scene, x, y, texture, frame);
     this.target = target;
+    this.alpha = 0;
 
     // ADD TO SCENE
     scene.add.existing(this);
+
+    this.levelUpHandler = () => {
+      if (this.target.level > 8) return;
+      this.COOL_DOWN_DURATION -= 5;
+      this.ACTIVATION_RADIUS -= 2.5;
+      this.MIN_SPAWNS += 0.25;
+      this.MAX_SPAWNS += 0.25;
+    };
+    this.scene.game.events.on(EVENTS_NAME.levelUp, this.levelUpHandler, this);
   }
 
   preUpdate(): void {
