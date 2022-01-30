@@ -53,7 +53,7 @@ export class Player extends Actor {
       if (this.hp < this.maxHP) {
         this.updateHp(15);
       } else {
-        this.xp += 10;
+        this.updateXp(10);
       }
     };
   }
@@ -85,15 +85,21 @@ export class Player extends Actor {
     this.scene.game.events.emit(EVENTS_NAME.hpChange, this.normalizedHP);
   }
 
-  onEnemyKilled() {
-    this.scene.cameras.main.shake(50, new Phaser.Math.Vector2(0.01, 0.0));
-    this.xp++;
-    this.enemiesHit++;
-    if (this.enemiesHit == this.maxHitsPerAttack) this.xp++;
-
-    if (this.xp > this.nextUpgrade) {
+  updateXp(value: number) {
+    this.xp += value;
+    if (this.xp >= this.nextUpgrade) {
       this.levelUp();
     }
+  }
+
+  onEnemyKilled() {
+    let xpGained = 1;
+    this.enemiesHit++;
+
+    if (this.enemiesHit == this.maxHitsPerAttack) xpGained++;
+
+    this.updateXp(xpGained);
+    this.scene.cameras.main.shake(50, new Phaser.Math.Vector2(0.01, 0.0));
   }
 
   update(): void {
@@ -157,9 +163,8 @@ export class Player extends Actor {
     this.updateHp(-value);
     this.scene.time.delayedCall(50, () => this.clearTint());
 
-    if (this.hp < 0) {
+    if (this.hp <= 0) {
       this.scene.game.events.emit(EVENTS_NAME.gameEnd, GameStatus.LOSE);
-      this.scene.game.events.off(EVENTS_NAME.chestLoot, this.chestLootHandler);
     }
   }
 }

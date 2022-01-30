@@ -33,6 +33,8 @@ export class UIScene extends Scene {
     };
 
     this.gameEndHandler = (status) => {
+      console.log('GAME OVER');
+
       this.cameras.main.setBackgroundColor('rgba(0,0,0,0.6)');
       this.game.scene.pause('level-1-scene');
 
@@ -77,18 +79,11 @@ export class UIScene extends Scene {
     this.hearts = [];
 
     for (let i = 0; i < this.maxHearts; i++) {
-      this.hearts.push(
-        this.add
-          .sprite(20 + 32 * (i + 1), 100, 'tiles_spr')
-          .setScale(2)
-          .setTint(0x88ff88),
-      );
+      this.hearts.push(this.add.sprite(20 + 32 * (i + 1), 100, 'tiles_spr').setScale(2));
     }
   }
 
   updateLife(life: number) {
-    console.log({ life });
-
     if (life / 2 > this.maxHearts) {
       this.maxHearts = Math.ceil(life / 2);
       this.createHearts();
