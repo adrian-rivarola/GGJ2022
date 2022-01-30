@@ -62,7 +62,7 @@ export class Player extends Actor {
   }
 
   get canAttack(): boolean {
-    return this.enemiesHit < this.maxHitsPerAttack;
+    return this.enemiesHit < Math.floor(this.maxHitsPerAttack);
   }
 
   get normalizedHP() {
@@ -75,22 +75,21 @@ export class Player extends Actor {
     this.maxHP += 30;
     this.updateHp(this.maxHP * 0.25);
 
-    if (this.level < 8) this.maxHitsPerAttack += 0.25;
-
-    this.nextUpgrade = Math.ceil(this.nextUpgrade * 1.1);
-    this.scene.cameras.main.flash();
-
-    const attackAnim = this.scene.anims.get('attack');
-    if (attackAnim.frameRate < 16) {
-      attackAnim.frameRate += 4;
+    if (this.level % 5 === 0) {
+      this.maxHitsPerAttack++;
+      const attackAnim = this.scene.anims.get('attack');
+      attackAnim.frameRate = Phaser.Math.Clamp(attackAnim.frameRate + 2, 8, 14);
     }
 
-    this.scene.game.events.emit(EVENTS_NAME.levelUp);
+    this.nextUpgrade = Math.ceil(this.nextUpgrade * 1.1);
+    this.scene?.cameras.main.flash();
+
+    this.scene?.game.events.emit(EVENTS_NAME.levelUp);
   }
 
   updateHp(value: number) {
     this.hp = Phaser.Math.Clamp(this.hp + value, 0, this.maxHP);
-    this.scene.game.events.emit(EVENTS_NAME.hpChange, this.normalizedHP);
+    this.scene?.game.events.emit(EVENTS_NAME.hpChange, this.normalizedHP);
   }
 
   updateXp(value: number) {
@@ -104,18 +103,18 @@ export class Player extends Actor {
     let xpGained = 1;
     this.enemiesHit++;
 
-    if (this.enemiesHit == this.maxHitsPerAttack) xpGained++;
+    if (this.enemiesHit == Math.floor(this.maxHitsPerAttack)) xpGained++;
 
     this.updateXp(xpGained);
-    this.scene.cameras.main.shake(50, new Phaser.Math.Vector2(0.01, 0.0));
+    if (this.enemiesHit < 2) {
+      this.scene.cameras.main.shake(50, new Phaser.Math.Vector2(0.005, 0.0));
+    }
   }
 
   update(): void {
     this.getBody().setVelocity(0);
 
-    this.hpText.setText(
-      `XP: ${this.xp}/${this.nextUpgrade}\nHP: ${this.normalizedHP}/${this.maxHP / 15}`,
-    );
+    this.hpText.setText(`XP: ${this.xp}/${this.nextUpgrade}\nAttack: ${this.maxHitsPerAttack}`);
     this.hpText.setPosition(this.x, this.y - this.height * 0.56);
     this.hpText.setOrigin(0.8, 0.5);
 
@@ -173,7 +172,7 @@ export class Player extends Actor {
 
     super.getDamage(value);
     this.updateHp(-value);
-    this.scene.time.delayedCall(50, () => this.clearTint());
+    this.scene.time.delayedCall(100, () => this.clearTint());
 
     if (this.hp <= 0) {
       this.scene.game.events.emit(EVENTS_NAME.gameEnd, GameStatus.LOSE);

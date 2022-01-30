@@ -54,8 +54,7 @@ export class Level1 extends Scene {
     );
 
     this.chests = chestPoints.map((chestPoint) =>
-      new Chest(this, chestPoint.x, chestPoint.y, 'tiles_spr', this.player, 595)
-        .setScale(1.5)
+      new Chest(this, chestPoint.x, chestPoint.y, 'tiles_spr', this.player, 595).setScale(1.5),
     );
   }
 
@@ -76,13 +75,13 @@ export class Level1 extends Scene {
   }
 
   public addEnemies(newEnemies: Enemy[]) {
-    this.physics.add.collider(this.enemies, this.wallsLayer);
+    this.physics.add.collider(newEnemies, this.wallsLayer);
     this.physics.add.collider(this.enemies, newEnemies);
     this.physics.add.collider(
       this.player,
       newEnemies,
       (obj1, obj2) => {
-        (obj1 as Player).getDamage(0.5);
+        (obj1 as Player).getDamage(0.25);
       },
       undefined,
       this,
