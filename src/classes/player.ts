@@ -11,7 +11,7 @@ export class Player extends Actor {
   private keyS: Input.Keyboard.Key;
   private keyD: Input.Keyboard.Key;
   private keySpace: Input.Keyboard.Key;
-  private hpText!: Text;
+  // private hpText!: Text;
   private maxHitsPerAttack = 2;
   private nextUpgrade = 16;
   private enemiesHit = 0;
@@ -35,9 +35,9 @@ export class Player extends Actor {
       this.scene.game.events.emit(EVENTS_NAME.attack);
     });
 
-    this.hpText = new Text(this.scene, this.x, this.y - this.height, this.hp.toString())
-      .setFontSize(12)
-      .setOrigin(0.8, 0.5);
+    // this.hpText = new Text(this.scene, this.x, this.y - this.height, this.hp.toString())
+    //   .setFontSize(12)
+    //   .setOrigin(0.8, 0.5);
 
     // PHYSICS
     this.getBody().setSize(30, 30);
@@ -114,9 +114,9 @@ export class Player extends Actor {
   update(): void {
     this.getBody().setVelocity(0);
 
-    this.hpText.setText(`XP: ${this.xp}/${this.nextUpgrade}\nAttack: ${this.maxHitsPerAttack}`);
-    this.hpText.setPosition(this.x, this.y - this.height * 0.56);
-    this.hpText.setOrigin(0.8, 0.5);
+    // this.hpText.setText(`XP: ${this.xp}/${this.nextUpgrade}\nAttack: ${this.maxHitsPerAttack}`);
+    // this.hpText.setPosition(this.x, this.y - this.height * 0.56);
+    // this.hpText.setOrigin(0.8, 0.5);
 
     if (this.keyW?.isDown) {
       this.body.velocity.y = -110;
