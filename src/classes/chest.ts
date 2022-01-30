@@ -60,9 +60,11 @@ export class Chest extends Actor {
     const overlap = this.scene.physics.add.overlap(this.target, this, () => {
       this.scene.physics.world.removeCollider(overlap);
       if (Math.random() < 0.3) {
+        this.scene.sound.add('badChest').play();
         this.anims.play('bad');
         this.target.getDamage(this.DAMAGE_POINTS);
       } else {
+        this.scene.sound.add('pickupCoin').play();
         this.anims.play('good');
         this.scene.game.events.emit(EVENTS_NAME.chestLoot);
       }

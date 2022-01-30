@@ -107,6 +107,7 @@ export class Player extends Actor {
 
     this.updateXp(xpGained);
     if (this.enemiesHit < 2) {
+      this.scene.sound.add('hitHurt').play();
       this.scene.cameras.main.shake(50, new Phaser.Math.Vector2(0.005, 0.0));
     }
   }
