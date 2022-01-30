@@ -68,7 +68,6 @@ export class Level1 extends Scene {
 
     enemiesPoints.forEach((enemyPoint) => {
       this.spawners.push(new Spawner(this, enemyPoint.x, enemyPoint.y, '', this.player));
-      enemies.push(new Enemy(this, enemyPoint.x, enemyPoint.y, 'tiles_spr', this.player, 503));
     });
 
     this.addEnemies(enemies);
@@ -77,6 +76,7 @@ export class Level1 extends Scene {
   public addEnemies(newEnemies: Enemy[]) {
     this.physics.add.collider(newEnemies, this.wallsLayer);
     this.physics.add.collider(this.enemies, newEnemies);
+    this.physics.add.collider(newEnemies, newEnemies);
     this.physics.add.collider(
       this.player,
       newEnemies,

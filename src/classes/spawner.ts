@@ -51,10 +51,10 @@ export class Spawner extends Actor {
         { x: this.x, y: this.y },
         { x: this.target.x, y: this.target.y },
       ) < this.ACTIVATION_RADIUS &&
-      this.coolDownTimer++ > this.COOL_DOWN_DURATION
+      this.coolDownTimer-- <= 0
     ) {
       (this.scene as Level1).addEnemies(this.createEnemies());
-      this.coolDownTimer = 0;
+      this.coolDownTimer = this.COOL_DOWN_DURATION;
     }
   }
 
